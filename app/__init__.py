@@ -1,7 +1,7 @@
 from flask import Flask
 from config import create_config_for_environment
-from app.student import controller as student_controller
-from app.reviewer import controller as reviewer_controller
+from app.code_review.controller import setup_controllers
+from app.db import db, init_db
 
 
 def create_app(config=None):
@@ -12,7 +12,8 @@ def create_app(config=None):
 
     app.config.from_object(config)
 
-    student_controller.setup_controllers(app)
-    reviewer_controller.setup_controllers(app)
+    init_db(app, db)
+
+    setup_controllers(app)
 
     return app
