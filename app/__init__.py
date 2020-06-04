@@ -1,7 +1,8 @@
 from flask import Flask
 from config import create_config_for_environment
-from app.code_review.controller import setup_controllers
+from app.code_review import setup_module as setup_code_review
 from app.db import db, init_db
+from app.errors import setup_errors
 
 
 def create_app(config=None):
@@ -14,6 +15,7 @@ def create_app(config=None):
 
     init_db(app, db)
 
-    setup_controllers(app)
+    setup_errors(app)
+    setup_code_review(app)
 
     return app

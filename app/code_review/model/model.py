@@ -16,12 +16,6 @@ class Reviewer(db.Model):
     )
 
 
-class Technology(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60), nullable=False)
-    description = db.Column(db.String(500), nullable=True)
-
-
 reviewer_technology = db.Table(
     'reviewer_technology',
     db.Column(
