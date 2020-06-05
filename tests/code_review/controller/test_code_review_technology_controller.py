@@ -162,3 +162,28 @@ def test_it_returns_404_when_there_is_no_technology(client):
     assert '404' in resp.status
     assert resp_data['error'] == 404
     assert 'Not found' in resp_data['message']
+
+
+def test_id_delete_technology(client):
+    python_data = {
+        'name': 'Python',
+        'description': 'Object oriented programming language',
+    }
+    elixir_data = {
+        'name': 'Elixir',
+        'description': 'Functional programming language',
+    }
+    client.post('/technologies', json=python_data)
+    create_resp = client.post('/technologies', json=elixir_data)
+    create_resp_data = create_resp.get_json()
+    resp = client.delete(create_resp_data['href'])
+    assert '204' in resp.status
+    assert len(Technology.query.all()) == 1
+
+
+def test_it_returns_404_if_deleted_technology_does_not_exis(client):
+    resp = client.delete('/technologies/1')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']

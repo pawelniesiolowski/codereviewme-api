@@ -93,3 +93,19 @@ def setup_technology_controller(app):
 
         formated_technologies = [tech.format() for tech in technologies]
         return jsonify({'data': formated_technologies})
+
+    @app.route('/technologies/<int:technology_id>', methods=['DELETE'])
+    def delete(technology_id):
+        try:
+            technology = Technology.query.get(technology_id)
+
+            if technology is None:
+                abort(404)
+
+            technology.delete()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        return '', 204
