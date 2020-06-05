@@ -137,3 +137,28 @@ def test_it_returns_404_if_edited_data_does_not_exist(client):
     assert '404' in resp.status
     assert resp_data['error'] == 404
     assert resp_data['message'] == 'Not found'
+
+
+def test_index_technologies(client):
+    python_data = {
+        'name': 'Python',
+        'description': 'Object oriented programming language',
+    }
+    elixir_data = {
+        'name': 'Elixir',
+        'description': 'Functional programming language',
+    }
+    client.post('/technologies', json=python_data)
+    client.post('/technologies', json=elixir_data)
+    resp = client.get('/technologies')
+    resp_data = resp.get_json()
+    assert '200' in resp.status
+    assert len(resp_data['data']) == 2
+
+
+def test_it_returns_404_when_there_is_no_technology(client):
+    resp = client.get('/technologies')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']

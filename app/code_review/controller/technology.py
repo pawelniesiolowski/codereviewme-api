@@ -78,3 +78,18 @@ def setup_technology_controller(app):
             db.session.close()
 
         return '', 204
+
+    @app.route('/technologies')
+    def index():
+        try:
+            technologies = Technology.query.all()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if not technologies:
+            abort(404)
+
+        formated_technologies = [tech.format() for tech in technologies]
+        return jsonify({'data': formated_technologies})
