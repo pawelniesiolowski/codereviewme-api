@@ -33,4 +33,14 @@ def setup_technology_controller(app):
 
     @app.route('/technologies/<int:technology_id>')
     def get_technology(technology_id):
-        pass
+        try:
+            technology = Technology.query.get(technology_id)
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if not technology:
+            abort(404)
+
+        return jsonify({'data': technology.format()}), 200

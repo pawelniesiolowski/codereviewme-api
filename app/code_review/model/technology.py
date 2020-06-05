@@ -9,3 +9,10 @@ class Technology(db.Model):
     def insert(self):
         db.session.add(self)
         db.session.commit()
+
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+        }

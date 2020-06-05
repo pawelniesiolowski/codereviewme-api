@@ -58,3 +58,27 @@ general-purpose programming language''',
     assert '409' in resp.status
     assert 409 == resp_data['error']
     assert 'Entity already exists' in resp_data['message']
+
+
+def test_it_gets_technology(client):
+    description = '''An interpreted, high-level,
+general-purpose programming language'''
+    data = {
+        'name': 'Python',
+        'description': description
+    }
+    post_resp = client.post('/technologies', json=data)
+    post_resp_data = post_resp.get_json()
+    get_resp = client.get(post_resp_data['href'])
+    get_resp_data = get_resp.get_json()
+    assert '200' in get_resp.status
+    assert get_resp_data['data']['name'] == 'Python'
+    assert get_resp_data['data']['description'] == description
+
+
+def test_it_returns_404_if_technology_does_not_exist(client):
+    resp = client.get('/technologies/1')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert 404 == resp_data['error']
+    assert 'Not found' in resp_data['message']

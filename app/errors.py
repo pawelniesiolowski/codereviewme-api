@@ -23,3 +23,10 @@ def setup_errors(app):
             'error': 409,
             'message': 'Entity already exists'
         }), 409
+
+    @app.errorhandler(404)
+    def validation_error(error):
+        return jsonify({
+            'error': 404,
+            'message': 'Not found'
+        }), 404
