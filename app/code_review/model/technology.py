@@ -23,3 +23,11 @@ class Technology(db.Model):
             'name': self.name,
             'description': self.description,
         }
+
+    def __repr__(self):
+        return f'''
+    <Technology
+        id: {self.id},
+        name: {self.name},
+        description: {self.description}
+    >'''
