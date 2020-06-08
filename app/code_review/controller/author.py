@@ -96,3 +96,17 @@ def setup_author_controller(app):
             db.session.close()
 
         return '', 204
+
+    @app.route('/authors/<int:author_id>', methods=['DELETE'])
+    def delete_author(author_id):
+        try:
+            author = Author.query.get(author_id)
+            if author is None:
+                abort(404)
+            author.delete()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        return '', 204

@@ -190,3 +190,26 @@ def test_it_returns_404_if_there_is_not_any_author(client):
     assert '404' in resp.status
     assert resp_data['error'] == 404
     assert 'Not found' in resp_data['message']
+
+
+def test_it_deletes_author(client):
+    data = {
+        'name': 'Paweł',
+        'surname': 'Niesiołowski',
+        'email': 'test@gmail.com',
+    }
+    created_author_data = client.post('/authors', json=data).get_json()
+    authors_before_delete = Author.query.all()
+    resp = client.delete(created_author_data['href'])
+    authors_after_delete = Author.query.all()
+    assert '204' in resp.status
+    assert len(authors_before_delete) == 1
+    assert len(authors_after_delete) == 0
+
+
+def test_it_returns_404_if_deleted_author_does_not_exist(client):
+    resp = client.delete('/authors/1')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']
