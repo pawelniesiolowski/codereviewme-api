@@ -1,5 +1,4 @@
 from app.code_review.model.author import Author
-from app.code_review.model.project import Project
 from tests.code_review.controller.fixture import client
 
 
