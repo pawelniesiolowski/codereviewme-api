@@ -21,6 +21,17 @@ class Author(db.Model):
                 return False
         return self.name != '' and self.surname != '' and self.email != ''
 
+    def format(self):
+        technologies = [tech.format() for tech in self.technologies]
+        return {
+            'id': self.id,
+            'name': self.name,
+            'surname': self.surname,
+            'email': self.email,
+            'description': self.description,
+            'technologies': technologies,
+        }
+
     def insert(self):
         db.session.add(self)
         db.session.commit()

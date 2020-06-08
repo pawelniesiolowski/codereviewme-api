@@ -80,7 +80,7 @@ def setup_technology_controller(app):
         return '', 204
 
     @app.route('/technologies')
-    def index():
+    def index_technologies():
         try:
             technologies = Technology.query.all()
         except SQLAlchemyError:
@@ -91,11 +91,11 @@ def setup_technology_controller(app):
         if not technologies:
             abort(404)
 
-        formated_technologies = [tech.format() for tech in technologies]
-        return jsonify({'data': formated_technologies})
+        formatted_technologies = [tech.format() for tech in technologies]
+        return jsonify({'data': formatted_technologies})
 
     @app.route('/technologies/<int:technology_id>', methods=['DELETE'])
-    def delete(technology_id):
+    def delete_technology(technology_id):
         try:
             technology = Technology.query.get(technology_id)
 

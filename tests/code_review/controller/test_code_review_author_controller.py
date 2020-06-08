@@ -123,3 +123,70 @@ def test_it_returns_404_if_edited_author_does_not_exist(client):
     assert '404' in resp.status
     assert resp_data['error'] == 404
     assert 'Not found' in resp_data['message']
+
+
+def test_it_get_author(client):
+    technology_data = {
+        'name': 'Python',
+        'description': 'Programming language.',
+    }
+    create_technology_resp_data = client.post(
+        '/technologies',
+        json=technology_data
+    ).get_json()
+    technology = client.get(
+        create_technology_resp_data['href']
+    ).get_json()['data']
+    data = {
+        'name': 'Paweł',
+        'surname': 'Niesiołowski',
+        'email': 'test@gmail.com',
+        'description': 'Pasionate programmer.',
+        'technologies': [technology['id']],
+    }
+    create_author_resp_data = client.post('/authors', json=data).get_json()
+    resp = client.get(create_author_resp_data['href'])
+    author = resp.get_json()['data']
+    assert '200' in resp.status
+    assert author['name'] == 'Paweł'
+    assert author['surname'] == 'Niesiołowski'
+    assert author['email'] == 'test@gmail.com'
+    assert author['description'] == 'Pasionate programmer.'
+    assert len(author['technologies']) == 1
+    assert author['technologies'][0]['name'] == 'Python'
+    assert author['technologies'][0]['description'] == 'Programming language.'
+
+
+def test_it_returns_404_if_author_does_not_exist(client):
+    resp = client.get('/authors/1')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']
+
+
+def test_it_indexes_authors(client):
+    first_author = {
+        'name': 'Paweł',
+        'surname': 'Niesiołowski',
+        'email': 'test@gmail.com',
+    }
+    second_author = {
+        'name': 'Gal',
+        'surname': 'Anonim',
+        'email': 'anonim@gmail.com',
+    }
+    client.post('/authors', json=first_author)
+    client.post('/authors', json=second_author)
+    resp = client.get('/authors')
+    resp_data = resp.get_json()['data']
+    assert '200' in resp.status
+    assert len(resp_data) == 2
+
+
+def test_it_returns_404_if_there_is_not_any_author(client):
+    resp = client.get('/authors')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']

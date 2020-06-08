@@ -36,9 +36,35 @@ def setup_author_controller(app):
             {'href': url_for('get_author', author_id=inserted_id)}
         ), 201
 
+    @app.route('/authors')
+    def index_authors():
+        try:
+            authors = Author.query.all()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if len(authors) == 0:
+            abort(404)
+
+        formatted_authors = [author.format() for author in authors]
+
+        return jsonify({'data': formatted_authors}), 200
+
     @app.route('/authors/<int:author_id>')
     def get_author(author_id):
-        pass
+        try:
+            author = Author.query.get(author_id)
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if author is None:
+            abort(404)
+
+        return jsonify({'data': author.format()}), 200
 
     @app.route('/authors/<int:author_id>', methods=['POST'])
     def edit_author(author_id):
