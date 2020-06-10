@@ -55,3 +55,42 @@ def setup_project_controller(app):
     @app.route('/authors/<int:author_id>/projects/<int:project_id>')
     def get_project(author_id, project_id):
         pass
+
+    @app.route(
+        '/authors/<int:author_id>/projects/<int:project_id>',
+        methods=['POST']
+    )
+    def edit_project(author_id, project_id):
+        data = request.get_json()
+
+        try:
+            author = Author.query.get(author_id)
+            if author is None:
+                abort(404)
+            project = Project.query.get(project_id)
+            if project is None:
+                abort(404)
+        except SQLAlchemyError:
+            db.session.close()
+            abort(500)
+
+        project.name = data.get('name', '')
+        project.description = data.get('description', '')
+        project.repository_url = data.get('repository_url', '')
+
+        project.technologies = []
+        try:
+            for technology_id in data.get('technologies', []):
+                technology = Technology.query.get(technology_id)
+                project.technologies.append(technology)
+
+            if not project.is_valid():
+                abort(422)
+
+            project.update()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        return '', 204
