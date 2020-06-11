@@ -54,7 +54,34 @@ def setup_project_controller(app):
 
     @app.route('/authors/<int:author_id>/projects/<int:project_id>')
     def get_project(author_id, project_id):
-        pass
+        try:
+            project = Project.query.get(project_id)
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if project is None or project.author_id != author_id:
+            abort(404)
+
+        return jsonify({'data': project.format()}), 200
+
+    @app.route('/authors/<int:author_id>/projects')
+    def index_projects(author_id):
+        try:
+            projects = Project.query.filter(
+                Project.author_id == author_id
+            ).all()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        if len(projects) == 0:
+            abort(404)
+
+        formatted_projects = [project.format() for project in projects]
+        return jsonify({'data': formatted_projects}), 200
 
     @app.route(
         '/authors/<int:author_id>/projects/<int:project_id>',
