@@ -15,6 +15,51 @@ class Reviewer(db.Model):
         backref=db.backref('reviewers', lazy=True)
     )
 
+    def is_valid(self):
+        if len(self.technologies) == 0:
+            return False
+
+        for technology in self.technologies:
+            if technology is None:
+                return False
+
+        return self.name != '' and self.surname != '' and self.email != ''
+
+    def format(self):
+        technologies = [tech.format() for tech in self.technologies]
+        return {
+            'id': self.id,
+            'name': self.name,
+            'surname': self.surname,
+            'email': self.email,
+            'description': self.description,
+            'repository_url': self.repository_url,
+            'technologies': technologies,
+        }
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return f'''
+    <Reviewer
+        id: {self.id},
+        name: {self.name},
+        surname: {self.surname},
+        email: {self.email},
+        description: {self.description},
+        repository_url = {self.repository_url},
+        technologies: {self.technologies}
+    >'''
+
 
 reviewer_technology = db.Table(
     'reviewer_technology',

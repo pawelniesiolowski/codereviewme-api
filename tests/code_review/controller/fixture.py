@@ -12,3 +12,15 @@ def client():
     db.create_all()
     client = app.test_client()
     yield client
+
+
+def create_technology_and_return_id(client, name='Python'):
+    technology_data = {
+        'name': name,
+        'description': 'Programming language.',
+    }
+    technology_href = client.post(
+        '/technologies',
+        json=technology_data
+    ).get_json()['href']
+    return client.get(technology_href).get_json()['data']['id']

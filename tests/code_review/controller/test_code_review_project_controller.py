@@ -1,5 +1,8 @@
 from app.code_review.model.project import Project
-from tests.code_review.controller.fixture import client
+from tests.code_review.controller.fixture import (
+    client,
+    create_technology_and_return_id
+)
 
 
 def test_it_creates_project_for_author(client):
@@ -183,15 +186,3 @@ def create_author_and_return_href(client):
         'email': 'test@gmail.com',
     }
     return client.post('/authors', json=author_data).get_json()['href']
-
-
-def create_technology_and_return_id(client, name='Python'):
-    technology_data = {
-        'name': name,
-        'description': 'Programming language.',
-    }
-    technology_href = client.post(
-        '/technologies',
-        json=technology_data
-    ).get_json()['href']
-    return client.get(technology_href).get_json()['data']['id']
