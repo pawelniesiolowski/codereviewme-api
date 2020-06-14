@@ -1,4 +1,5 @@
 from flask import jsonify
+from app.auth.error import AuthError
 
 
 def setup_errors(app):
@@ -30,3 +31,11 @@ def setup_errors(app):
             'error': 404,
             'message': 'Not found'
         }), 404
+
+    @app.errorhandler(AuthError)
+    def auth_error(error):
+        return jsonify({
+            'success': False,
+            'error': error.error['code'],
+            'message': error.error['message']
+        }), 401

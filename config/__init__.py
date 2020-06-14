@@ -11,6 +11,9 @@ class Config:
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    AUTH0_DOMAIN = 'intodevnull.eu.auth0.com'
+    ALGORITHMS = ['RS256']
+    API_AUDIENCE = 'https://codereviewme.org/api'
 
 
 class ProductionConfig(Config):
