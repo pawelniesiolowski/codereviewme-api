@@ -67,7 +67,7 @@ def setup_reviewer_controller(app):
 
         return jsonify({'data': reviewer.format()}), 200
 
-    @app.route('/reviewers/<int:reviewer_id>', methods=['POST'])
+    @app.route('/reviewers/<int:reviewer_id>', methods=['PATCH'])
     def edit_reviewer(reviewer_id):
         data = request.get_json()
 
@@ -77,16 +77,23 @@ def setup_reviewer_controller(app):
             if reviewer is None:
                 abort(404)
 
-            reviewer.name = data.get('name', '')
-            reviewer.surname = data.get('surname', '')
-            reviewer.email = data.get('email', '')
-            reviewer.description = data.get('description', '')
-            reviewer.repository_url = data.get('repository_url', '')
-            reviewer.technologies = []
+            if 'name' in data:
+                reviewer.name = data.get('name', '')
+            if 'surname' in data:
+                reviewer.surname = data.get('surname', '')
+            if 'email' in data:
+                reviewer.email = data.get('email', '')
+            if 'description' in data:
+                reviewer.description = data.get('description', '')
+            if 'repository_url' in data:
+                reviewer.repository_url = data.get('repository_url', '')
 
-            for technology_id in data.get('technologies', []):
-                technology = Technology.query.get(technology_id)
-                reviewer.technologies.append(technology)
+            if 'technologies' in data:
+                reviewer.technologies = []
+
+                for technology_id in data.get('technologies', []):
+                    technology = Technology.query.get(technology_id)
+                    reviewer.technologies.append(technology)
 
             if not reviewer.is_valid():
                 abort(422)

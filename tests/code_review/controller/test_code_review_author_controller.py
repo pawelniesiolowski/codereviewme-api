@@ -71,19 +71,23 @@ def test_it_returns_validation_error_if_technology_does_not_exist(client):
     assert 'Validation error' in resp_data['message']
 
 
-def test_it_edits_base_author_data(client):
+def test_it_edits_given_authors_data(client):
     data = {
         'name': 'Paweł',
         'surname': 'Niesiołowski',
         'email': 'test@gmail.com',
-        'description': 'Pasionate programmer.',
     }
-    create_resp_data = client.post('/authors', json=data).get_json()
-    data['email'] = 'edit_test@gmail.com'
-    resp = client.post(create_resp_data['href'], json=data)
+    author_href = client.post('/authors', json=data).get_json()['href']
+    edited_data = {
+        'email': 'edit_test@gmail.com',
+    }
+    resp = client.patch(author_href, json=edited_data)
     authors = Author.query.filter(Author.email == 'edit_test@gmail.com').all()
     assert '204' in resp.status
     assert len(authors) == 1
+    author = authors[0]
+    assert author.name == 'Paweł'
+    assert author.surname == 'Niesiołowski'
 
 
 def test_it_changes_technologies_for_author(client):
@@ -103,12 +107,14 @@ def test_it_changes_technologies_for_author(client):
         'name': 'Paweł',
         'surname': 'Niesiołowski',
         'email': 'test@gmail.com',
-        'description': 'Pasionate programmer.',
         'technologies': [python_technology['id']],
     }
-    create_resp_data = client.post('/authors', json=data).get_json()
-    data['technologies'] = [elixir_technology['id']]
-    resp = client.post(create_resp_data['href'], json=data)
+    author_href = client.post('/authors', json=data).get_json()['href']
+
+    edited_data = {
+        'technologies': [elixir_technology['id']],
+    }
+    resp = client.patch(author_href, json=edited_data)
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
     assert '204' in resp.status
     assert len(authors) == 1
@@ -117,14 +123,14 @@ def test_it_changes_technologies_for_author(client):
 
 
 def test_it_returns_404_if_edited_author_does_not_exist(client):
-    resp = client.post('/authors/1', json=[])
+    resp = client.patch('/authors/1', json=[])
     resp_data = resp.get_json()
     assert '404' in resp.status
     assert resp_data['error'] == 404
     assert 'Not found' in resp_data['message']
 
 
-def test_it_get_author(client):
+def test_it_gets_author(client):
     technology_data = {
         'name': 'Python',
         'description': 'Programming language.',

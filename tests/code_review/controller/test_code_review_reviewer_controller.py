@@ -43,7 +43,7 @@ def test_it_returns_422_if_reviewer_does_not_have_any_technology(client):
 def test_it_edits_reviewer(client):
     python_id = create_technology_and_return_id(client, 'Python')
     elixir_id = create_technology_and_return_id(client, 'Elixir')
-    reviewer_data = {
+    new_reviewer_data = {
         'name': 'Paweł',
         'surname': 'Niesiołowski',
         'email': 'test@gmail.com',
@@ -52,12 +52,15 @@ def test_it_edits_reviewer(client):
     }
     reviewer_href = client.post(
         '/reviewers',
-        json=reviewer_data
+        json=new_reviewer_data
     ).get_json()['href']
-    reviewer_data['description'] = 'Very experienced programmer.'
-    reviewer_data['technologies'].append(elixir_id)
 
-    resp = client.post(reviewer_href, json=reviewer_data)
+    edited_reviewer_data = {
+        'description': 'Very experienced programmer.',
+        'technologies': [python_id, elixir_id],
+    }
+
+    resp = client.patch(reviewer_href, json=edited_reviewer_data)
     reviewers = Reviewer.query.filter(
         Reviewer.description == 'Very experienced programmer.'
     ).all()
@@ -68,7 +71,7 @@ def test_it_edits_reviewer(client):
 
 
 def test_it_returns_404_if_edited_reviewer_does_not_exists(client):
-    resp = client.post('/reviewers/1', json=[])
+    resp = client.patch('/reviewers/1', json=[])
     resp_data = resp.get_json()
     assert '404' in resp.status
     assert resp_data['error'] == 404

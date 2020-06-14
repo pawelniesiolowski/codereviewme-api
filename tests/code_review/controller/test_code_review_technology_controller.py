@@ -82,10 +82,8 @@ def test_it_edits_technology(client):
     get_resp_data = get_resp.get_json()
     edited_data = {
         'name': 'Python',
-        'description': '''An interpreted, high-level,
-general-purpose programming language''',
     }
-    edit_resp = client.post(create_resp_data['href'], json=edited_data)
+    edit_resp = client.patch(create_resp_data['href'], json=edited_data)
     assert '204' in edit_resp.status
     technologies = Technology.query.filter(Technology.name == 'Python').all()
     assert len(technologies) == 1
@@ -105,21 +103,35 @@ def test_it_returns_conflict_error_if_new_technology_name_exist(client):
     client.post('/technologies', json=elixir_data)
     edited_data = {
         'name': 'Elixir',
-        'description': 'Object oriented programming language',
     }
-    edited_resp = client.post(create_resp_data['href'], json=edited_data)
+    edited_resp = client.patch(create_resp_data['href'], json=edited_data)
     edited_resp_data = edited_resp.get_json()
     assert '409' in edited_resp.status
     assert edited_resp_data['error'] == 409
     assert 'Entity already exists' in edited_resp_data['message']
 
 
+def test_it_returns_404_if_technology_name_is_empty_string(client):
+    data = {
+        'name': 'Python',
+        'description': 'Object oriented programming language',
+    }
+    href = client.post(
+        '/technologies',
+        json=data
+    ).get_json()['href']
+    resp = client.patch(href, json={'name': ''})
+    resp_data = resp.get_json()
+    assert '422' in resp.status
+    assert resp_data['error'] == 422
+    assert 'Validation error' in resp_data['message']
+
+
 def test_it_returns_404_if_edited_data_does_not_exist(client):
     data = {
         'name': 'Python',
-        'description': 'Programming language',
     }
-    resp = client.post('/technologies/1', json=data)
+    resp = client.patch('/technologies/1', json=data)
     resp_data = resp.get_json()
     assert '404' in resp.status
     assert resp_data['error'] == 404

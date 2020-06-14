@@ -17,6 +17,9 @@ class Technology(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def is_valid(self):
+        return self.name != '' and self.description != ''
+
     def format(self):
         return {
             'id': self.id,

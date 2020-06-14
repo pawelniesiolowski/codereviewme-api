@@ -66,7 +66,7 @@ def setup_author_controller(app):
 
         return jsonify({'data': author.format()}), 200
 
-    @app.route('/authors/<int:author_id>', methods=['POST'])
+    @app.route('/authors/<int:author_id>', methods=['PATCH'])
     def edit_author(author_id):
         data = request.get_json()
 
@@ -76,15 +76,20 @@ def setup_author_controller(app):
             if author is None:
                 abort(404)
 
-            author.name = data.get('name', '')
-            author.surname = data.get('surname', '')
-            author.email = data.get('email', '')
-            author.description = data.get('description', '')
-            author.technologies = []
+            if 'name' in data:
+                author.name = data.get('name', '')
+            if 'surname' in data:
+                author.surname = data.get('surname', '')
+            if 'email' in data:
+                author.email = data.get('email', '')
+            if 'description' in data:
+                author.description = data.get('description', '')
+            if 'technologies' in data:
+                author.technologies = []
 
-            for technology_id in data.get('technologies', []):
-                technology = Technology.query.get(technology_id)
-                author.technologies.append(technology)
+                for technology_id in data.get('technologies', []):
+                    technology = Technology.query.get(technology_id)
+                    author.technologies.append(technology)
 
             if not author.is_valid():
                 abort(422)

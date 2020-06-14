@@ -91,15 +91,22 @@ def test_it_edits_project(client):
         json=project_data
     ).get_json()['href']
 
-    project_data['name'] = 'Test Project v2'
-    project_data['technologies'] = [js_technology_id]
-    resp = client.post(f'{project_href}', json=project_data)
-    projects = Project.query.filter(Project.name == project_data['name']).all()
+    edited_project = {
+        'name': 'Test Project v2',
+        'technologies': [js_technology_id],
+    }
+    resp = client.patch(f'{project_href}', json=edited_project)
+    projects = Project.query.filter(
+        Project.name == edited_project['name']
+    ).all()
 
     assert '204' in resp.status
     assert len(projects) == 1
-    assert len(projects[0].technologies) == 1
-    assert projects[0].technologies[0].name == 'JavaScript'
+    project = projects[0]
+    assert len(project.technologies) == 1
+    assert project.technologies[0].name == 'JavaScript'
+    assert project.description == project_data['description']
+    assert project.repository_url == project_data['repository_url']
 
 
 def test_it_returns_404_if_edited_project_does_not_exist(client):
@@ -111,7 +118,7 @@ def test_it_returns_404_if_edited_project_does_not_exist(client):
         'repository_url': 'https://github.com/pawelniesiolowski/test_project',
         'technologies': [technology_id],
     }
-    resp = client.post(f'{author_href}/projects/1', json=project_data)
+    resp = client.patch(f'{author_href}/projects/1', json=project_data)
     resp_data = resp.get_json()
 
     assert '404' in resp.status

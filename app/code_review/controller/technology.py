@@ -10,16 +10,18 @@ def setup_technology_controller(app):
     def create_technology():
         data = request.get_json()
 
-        if not data['name'] or not data['description']:
-            abort(422)
-
         try:
             if Technology.query.filter(Technology.name == data['name']).all():
                 abort(409)
-            technology = Technology(
-                name=data['name'],
-                description=data['description'],
-            )
+
+            technology = Technology()
+            if 'name' in data:
+                technology.name = data.get('name', '')
+            if 'description' in data:
+                technology.description = data.get('description', '')
+            if not technology.is_valid():
+                abort(422)
+
             technology.insert()
             inserted_id = technology.id
         except SQLAlchemyError:
@@ -45,12 +47,9 @@ def setup_technology_controller(app):
 
         return jsonify({'data': technology.format()}), 200
 
-    @app.route('/technologies/<int:technology_id>', methods=['POST'])
+    @app.route('/technologies/<int:technology_id>', methods=['PATCH'])
     def edit_technology(technology_id):
         data = request.get_json()
-
-        if not data['name'] and not data['description']:
-            abort(422)
 
         try:
             technology = Technology.query.get(technology_id)
@@ -58,7 +57,7 @@ def setup_technology_controller(app):
             if technology is None:
                 abort(404)
 
-            if data['name']:
+            if 'name' in data:
                 if (
                     Technology.query
                         .filter(Technology.name == data['name'])
@@ -66,10 +65,13 @@ def setup_technology_controller(app):
                 ):
                     abort(409)
                 else:
-                    technology.name = data['name']
+                    technology.name = data.get('name', '')
 
-            if data['description']:
-                technology.description = data['description']
+            if 'description' in data:
+                technology.description = data.get('description', '')
+
+            if not technology.is_valid():
+                abort(422)
 
             technology.update()
         except SQLAlchemyError:

@@ -85,7 +85,7 @@ def setup_project_controller(app):
 
     @app.route(
         '/authors/<int:author_id>/projects/<int:project_id>',
-        methods=['POST']
+        methods=['PATCH']
     )
     def edit_project(author_id, project_id):
         data = request.get_json()
@@ -101,15 +101,19 @@ def setup_project_controller(app):
             db.session.close()
             abort(500)
 
-        project.name = data.get('name', '')
-        project.description = data.get('description', '')
-        project.repository_url = data.get('repository_url', '')
+        if 'name' in data:
+            project.name = data.get('name', '')
+        if 'description' in data:
+            project.description = data.get('description', '')
+        if 'repository_url' in data:
+            project.repository_url = data.get('repository_url', '')
 
-        project.technologies = []
         try:
-            for technology_id in data.get('technologies', []):
-                technology = Technology.query.get(technology_id)
-                project.technologies.append(technology)
+            if 'technologies' in data:
+                project.technologies = []
+                for technology_id in data.get('technologies', []):
+                    technology = Technology.query.get(technology_id)
+                    project.technologies.append(technology)
 
             if not project.is_valid():
                 abort(422)
