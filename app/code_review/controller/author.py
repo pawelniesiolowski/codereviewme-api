@@ -3,11 +3,13 @@ from app.code_review.model.author import Author
 from app.code_review.model.technology import Technology
 from app.db import db
 from sqlalchemy.exc import SQLAlchemyError
+from app.auth.auth import requires_auth
 
 
 def setup_author_controller(app):
 
     @app.route('/authors', methods=['POST'])
+    @requires_auth('create:author')
     def create_author():
         data = request.get_json()
         author = Author(
@@ -67,6 +69,7 @@ def setup_author_controller(app):
         return jsonify({'data': author.format()}), 200
 
     @app.route('/authors/<int:author_id>', methods=['PATCH'])
+    @requires_auth('edit:author')
     def edit_author(author_id):
         data = request.get_json()
 
@@ -103,6 +106,7 @@ def setup_author_controller(app):
         return '', 204
 
     @app.route('/authors/<int:author_id>', methods=['DELETE'])
+    @requires_auth('delete:author')
     def delete_author(author_id):
         try:
             author = Author.query.get(author_id)

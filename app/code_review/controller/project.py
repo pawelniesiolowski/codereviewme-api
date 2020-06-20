@@ -4,11 +4,13 @@ from app.code_review.model.project import Project
 from app.code_review.model.technology import Technology
 from app.db import db
 from sqlalchemy.exc import SQLAlchemyError
+from app.auth.auth import requires_auth
 
 
 def setup_project_controller(app):
 
     @app.route('/authors/<int:author_id>/projects', methods=['POST'])
+    @requires_auth('create:project')
     def create_project(author_id):
         data = request.get_json()
 
@@ -87,6 +89,7 @@ def setup_project_controller(app):
         '/authors/<int:author_id>/projects/<int:project_id>',
         methods=['PATCH']
     )
+    @requires_auth('edit:project')
     def edit_project(author_id, project_id):
         data = request.get_json()
 
@@ -130,6 +133,7 @@ def setup_project_controller(app):
         '/authors/<int:author_id>/projects/<int:project_id>',
         methods=['DELETE']
     )
+    @requires_auth('delete:project')
     def delete_project(author_id, project_id):
         try:
             project = Project.query.filter(

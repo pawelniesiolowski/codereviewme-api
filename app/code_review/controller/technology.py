@@ -2,11 +2,13 @@ from flask import request, jsonify, abort, url_for
 from app.code_review.model.technology import Technology
 from app.db import db
 from sqlalchemy.exc import SQLAlchemyError
+from app.auth.auth import requires_auth
 
 
 def setup_technology_controller(app):
 
     @app.route('/technologies', methods=['POST'])
+    @requires_auth('create:technology')
     def create_technology():
         data = request.get_json()
 
@@ -48,6 +50,7 @@ def setup_technology_controller(app):
         return jsonify({'data': technology.format()}), 200
 
     @app.route('/technologies/<int:technology_id>', methods=['PATCH'])
+    @requires_auth('edit:technology')
     def edit_technology(technology_id):
         data = request.get_json()
 
@@ -97,6 +100,7 @@ def setup_technology_controller(app):
         return jsonify({'data': formatted_technologies})
 
     @app.route('/technologies/<int:technology_id>', methods=['DELETE'])
+    @requires_auth('delete:technology')
     def delete_technology(technology_id):
         try:
             technology = Technology.query.get(technology_id)

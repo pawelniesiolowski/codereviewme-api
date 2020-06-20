@@ -1,7 +1,8 @@
 from app.code_review.model.reviewer import Reviewer
 from tests.code_review.controller.fixture import (
     client,
-    create_technology_and_return_id
+    create_technology_and_return_id,
+    auth_header_with_all_scopes
 )
 
 
@@ -13,7 +14,11 @@ def test_it_creates_reviewer(client):
         'email': 'test@gmail.com',
         'technologies': [technology_id],
     }
-    resp = client.post('/reviewers', json=reviewer_data)
+    resp = client.post(
+        '/reviewers',
+        json=reviewer_data,
+        headers=auth_header_with_all_scopes
+    )
     reviewer_href = resp.get_json()['href']
     reviewers = Reviewer.query.filter(Reviewer.surname == 'Niesiołowski').all()
 
@@ -30,7 +35,11 @@ def test_it_returns_422_if_reviewer_does_not_have_any_technology(client):
         'email': 'test@gmail.com',
         'technologies': '',
     }
-    resp = client.post('/reviewers', json=reviewer_data)
+    resp = client.post(
+        '/reviewers',
+        json=reviewer_data,
+        headers=auth_header_with_all_scopes
+    )
     resp_data = resp.get_json()
     reviewers = Reviewer.query.filter(Reviewer.surname == 'Niesiołowski').all()
 
@@ -52,7 +61,8 @@ def test_it_edits_reviewer(client):
     }
     reviewer_href = client.post(
         '/reviewers',
-        json=new_reviewer_data
+        json=new_reviewer_data,
+        headers=auth_header_with_all_scopes
     ).get_json()['href']
 
     edited_reviewer_data = {
@@ -60,7 +70,11 @@ def test_it_edits_reviewer(client):
         'technologies': [python_id, elixir_id],
     }
 
-    resp = client.patch(reviewer_href, json=edited_reviewer_data)
+    resp = client.patch(
+        reviewer_href,
+        json=edited_reviewer_data,
+        headers=auth_header_with_all_scopes
+    )
     reviewers = Reviewer.query.filter(
         Reviewer.description == 'Very experienced programmer.'
     ).all()
@@ -71,7 +85,11 @@ def test_it_edits_reviewer(client):
 
 
 def test_it_returns_404_if_edited_reviewer_does_not_exists(client):
-    resp = client.patch('/reviewers/1', json=[])
+    resp = client.patch(
+        '/reviewers/1',
+        json=[],
+        headers=auth_header_with_all_scopes
+    )
     resp_data = resp.get_json()
     assert '404' in resp.status
     assert resp_data['error'] == 404
@@ -88,7 +106,8 @@ def test_it_gets_reviewer(client):
     }
     reviewer_href = client.post(
         '/reviewers',
-        json=reviewer_data
+        json=reviewer_data,
+        headers=auth_header_with_all_scopes
     ).get_json()['href']
 
     resp = client.get(reviewer_href)
@@ -124,8 +143,16 @@ def test_it_indexes_reviewers(client):
         'email': 'anonim@gmail.com',
         'technologies': [technology_id],
     }
-    client.post('/reviewers', json=first_reviewer)
-    client.post('/reviewers', json=second_reviewer)
+    client.post(
+        '/reviewers',
+        json=first_reviewer,
+        headers=auth_header_with_all_scopes
+    )
+    client.post(
+        '/reviewers',
+        json=second_reviewer,
+        headers=auth_header_with_all_scopes
+    )
     resp = client.get('/reviewers')
     resp_data = resp.get_json()['data']
     assert '200' in resp.status
@@ -150,10 +177,14 @@ def test_it_deletes_reviewer(client):
     }
     created_reviewer_href = client.post(
         '/reviewers',
-        json=data
+        json=data,
+        headers=auth_header_with_all_scopes
     ).get_json()['href']
     reviewers_before_delete = Reviewer.query.all()
-    resp = client.delete(created_reviewer_href)
+    resp = client.delete(
+        created_reviewer_href,
+        headers=auth_header_with_all_scopes
+    )
     reviewers_after_delete = Reviewer.query.all()
     assert '204' in resp.status
     assert len(reviewers_before_delete) == 1
@@ -161,7 +192,7 @@ def test_it_deletes_reviewer(client):
 
 
 def test_it_returns_404_if_deleted_reviewer_does_not_exist(client):
-    resp = client.delete('/reviewers/1')
+    resp = client.delete('/reviewers/1', headers=auth_header_with_all_scopes)
     resp_data = resp.get_json()
     assert '404' in resp.status
     assert resp_data['error'] == 404

@@ -14,7 +14,8 @@ class Config:
     AUTH0_DOMAIN = 'intodevnull.eu.auth0.com'
     ALGORITHMS = ['RS256']
     API_AUDIENCE = 'https://codereviewme.org/api'
-
+    CLIENT_ID = environ.get('CLIENT_ID')
+    CLIENT_SECRET = environ.get('CLIENT_SECRET')
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')

@@ -3,11 +3,13 @@ from app.code_review.model.reviewer import Reviewer
 from app.code_review.model.technology import Technology
 from app.db import db
 from sqlalchemy.exc import SQLAlchemyError
+from app.auth.auth import requires_auth
 
 
 def setup_reviewer_controller(app):
 
     @app.route('/reviewers', methods=['POST'])
+    @requires_auth('create:reviewer')
     def create_reviewer():
         data = request.get_json()
         reviewer = Reviewer(
@@ -68,6 +70,7 @@ def setup_reviewer_controller(app):
         return jsonify({'data': reviewer.format()}), 200
 
     @app.route('/reviewers/<int:reviewer_id>', methods=['PATCH'])
+    @requires_auth('edit:reviewer')
     def edit_reviewer(reviewer_id):
         data = request.get_json()
 
@@ -107,6 +110,7 @@ def setup_reviewer_controller(app):
         return '', 204
 
     @app.route('/reviewers/<int:reviewer_id>', methods=['DELETE'])
+    @requires_auth('delete:reviewer')
     def delete_reviewer(reviewer_id):
         try:
             reviewer = Reviewer.query.get(reviewer_id)

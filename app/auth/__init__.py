@@ -1,6 +1,7 @@
+import json
 from urllib.request import urlopen
 from app.auth.error import AuthError
-from flask import request
+from flask import request, current_app
 from jose import jwt
 
 
@@ -43,7 +44,7 @@ def check_permissions(permission, payload):
 
 def verify_decode_jwt(token):
     jsonurl = urlopen(
-        f'https://{app.config["AUTH0_DOMAIN"]}/.well-known/jwks.json'
+        f'https://{current_app.config["AUTH0_DOMAIN"]}/.well-known/jwks.json'
     )
     jwks = json.loads(jsonurl.read())
     unverified_header = jwt.get_unverified_header(token)
@@ -74,9 +75,9 @@ def verify_decode_jwt(token):
         payload = jwt.decode(
             token,
             rsa_key,
-            algorithms=app.config["ALGORITHMS"],
-            audience=app.config["API_AUDIENCE"],
-            issuer='https://' + app.config["AUTH0_DOMAIN"] + '/'
+            algorithms=current_app.config["ALGORITHMS"],
+            audience=current_app.config["API_AUDIENCE"],
+            issuer='https://' + current_app.config["AUTH0_DOMAIN"] + '/'
         )
         return payload
     except jwt.ExpiredSignatureError:
