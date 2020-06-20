@@ -1,5 +1,8 @@
 from app.code_review.model.author import Author
-from tests.code_review.controller.fixture import client
+from tests.code_review.controller.fixture import (
+    client,
+    create_technology_and_return_id
+)
 
 
 def test_it_creates_author_without_technologies_and_projects(client):
@@ -198,10 +201,12 @@ def test_it_returns_404_if_there_is_not_any_author(client):
 
 
 def test_it_deletes_author(client):
+    technology_id = create_technology_and_return_id(client, 'Python')
     data = {
         'name': 'Paweł',
         'surname': 'Niesiołowski',
         'email': 'test@gmail.com',
+        'technologies': [technology_id],
     }
     created_author_data = client.post('/authors', json=data).get_json()
     authors_before_delete = Author.query.all()

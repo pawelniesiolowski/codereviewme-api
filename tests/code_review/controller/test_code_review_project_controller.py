@@ -186,6 +186,33 @@ def test_returns_404_if_author_does_not_have_any_projects(client):
     assert 'Not found' in resp_data['message']
 
 
+def test_it_deletes_project_for_author(client):
+    author_href = create_author_and_return_href(client)
+    technology_id = create_technology_and_return_id(client, 'Python')
+    project_data = {
+        'name': 'Test Project',
+        'description': 'Test description.',
+        'repository_url': 'https://github.com/pawel/first_project',
+        'technologies': [technology_id],
+    }
+    project_href = client.post(
+        f'{author_href}/projects',
+        json=project_data
+    ).get_json()['href']
+    resp = client.delete(project_href)
+    projects = Project.query.filter(Project.name == 'Test Project').all()
+    assert '204' in resp.status
+    assert len(projects) == 0
+
+
+def test_it_returns_404_if_project_for_author_does_not_exist(client):
+    resp = client.delete('authors/1/projects/1')
+    resp_data = resp.get_json()
+    assert '404' in resp.status
+    assert resp_data['error'] == 404
+    assert 'Not found' in resp_data['message']
+
+
 def create_author_and_return_href(client):
     author_data = {
         'name': 'Paweł',

@@ -125,3 +125,25 @@ def setup_project_controller(app):
             db.session.close()
 
         return '', 204
+
+    @app.route(
+        '/authors/<int:author_id>/projects/<int:project_id>',
+        methods=['DELETE']
+    )
+    def delete_project(author_id, project_id):
+        try:
+            project = Project.query.filter(
+                Project.id == project_id,
+                Project.author_id == author_id
+            ).first()
+
+            if project is None:
+                abort(404)
+
+            project.delete()
+        except SQLAlchemyError:
+            abort(500)
+        finally:
+            db.session.close()
+
+        return '', 204
