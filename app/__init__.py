@@ -21,3 +21,5 @@ def create_app(config=None):
     setup_code_review(app)
 
     return app
+
+app = create_app()
