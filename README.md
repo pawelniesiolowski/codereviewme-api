@@ -43,4 +43,4 @@ https://codereviewme-api.herokuapp.com/
 [Code Review Me API](./app/code_review/README.md)
 
 # License
-Copyright © 2019 Paweł Niesiołowski. MIT license.
+Copyright © 2020 Paweł Niesiołowski. MIT license.
