@@ -22,4 +22,10 @@ def create_app(config=None):
 
     return app
 
+
 app = create_app()
+
+
+@app.route('/')
+def info():
+    return 'Experience is the name everyone gives to their mistakes'
