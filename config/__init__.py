@@ -14,8 +14,6 @@ class Config:
     AUTH0_DOMAIN = 'intodevnull.eu.auth0.com'
     ALGORITHMS = ['RS256']
     API_AUDIENCE = environ.get('API_AUDIENCE')
-    CLIENT_ID = environ.get('CLIENT_ID')
-    CLIENT_SECRET = environ.get('CLIENT_SECRET')
 
 
 class ProductionConfig(Config):
@@ -31,6 +29,8 @@ class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'postgresql:///codereviewme_test'
+    CLIENT_ID = environ.get('CLIENT_ID')
+    CLIENT_SECRET = environ.get('CLIENT_SECRET')
     REVIEWER_CLIENT_ID = '6BhqOLSJBG7ftU1xLj5ZZYJ0Imv5RxhZ'
     REVIEWER_CLIENT_SECRET = (
         'gwr-S-ctQ3cIGqFA8d_RIA1MZf7MSpTiWpw0Y_vLEq7DdSYmzq1OAMkeTYTNxjvs'
