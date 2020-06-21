@@ -1,7 +1,7 @@
 from app.code_review.model.technology import Technology
 from tests.code_review.controller.fixture import (
     client,
-    auth_header_with_all_scopes
+    auth_header_with_all_permissions
 )
 
 
@@ -14,7 +14,7 @@ general-purpose programming language''',
     resp = client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '201' in resp.status
@@ -32,7 +32,7 @@ def test_it_returns_validation_error_when_technology_data_is_invalid(client):
     resp = client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '422' in resp.status
@@ -53,12 +53,12 @@ general-purpose programming language''',
     client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp = client.post(
         '/technologies',
         json=data_with_already_added_name,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '409' in resp.status
@@ -76,7 +76,7 @@ general-purpose programming language'''
     post_resp = client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     post_resp_data = post_resp.get_json()
     get_resp = client.get(post_resp_data['href'])
@@ -102,7 +102,7 @@ def test_it_edits_technology(client):
     create_resp = client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     create_resp_data = create_resp.get_json()
     get_resp = client.get(create_resp_data['href'])
@@ -113,7 +113,7 @@ def test_it_edits_technology(client):
     edit_resp = client.patch(
         create_resp_data['href'],
         json=edited_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     assert '204' in edit_resp.status
     technologies = Technology.query.filter(Technology.name == 'Python').all()
@@ -132,13 +132,13 @@ def test_it_returns_conflict_error_if_new_technology_name_exist(client):
     create_resp = client.post(
         '/technologies',
         json=python_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     create_resp_data = create_resp.get_json()
     client.post(
         '/technologies',
         json=elixir_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     edited_data = {
         'name': 'Elixir',
@@ -146,7 +146,7 @@ def test_it_returns_conflict_error_if_new_technology_name_exist(client):
     edited_resp = client.patch(
         create_resp_data['href'],
         json=edited_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     edited_resp_data = edited_resp.get_json()
     assert '409' in edited_resp.status
@@ -162,12 +162,12 @@ def test_it_returns_404_if_technology_name_is_empty_string(client):
     href = client.post(
         '/technologies',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
     resp = client.patch(
         href,
         json={'name': ''},
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '422' in resp.status
@@ -182,7 +182,7 @@ def test_it_returns_404_if_edited_data_does_not_exist(client):
     resp = client.patch(
         '/technologies/1',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '404' in resp.status
@@ -202,12 +202,12 @@ def test_index_technologies(client):
     client.post(
         '/technologies',
         json=python_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     client.post(
         '/technologies',
         json=elixir_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp = client.get('/technologies')
     resp_data = resp.get_json()
@@ -235,17 +235,17 @@ def test_id_delete_technology(client):
     client.post(
         '/technologies',
         json=python_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     create_resp = client.post(
         '/technologies',
         json=elixir_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     create_resp_data = create_resp.get_json()
     resp = client.delete(
         create_resp_data['href'],
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     assert '204' in resp.status
     assert len(Technology.query.all()) == 1
@@ -254,7 +254,7 @@ def test_id_delete_technology(client):
 def test_it_returns_404_if_deleted_technology_does_not_exis(client):
     resp = client.delete(
         '/technologies/1',
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '404' in resp.status

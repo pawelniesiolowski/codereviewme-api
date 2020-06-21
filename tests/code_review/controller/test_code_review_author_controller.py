@@ -2,7 +2,7 @@ from app.code_review.model.author import Author
 from tests.code_review.controller.fixture import (
     client,
     create_technology_and_return_id,
-    auth_header_with_all_scopes
+    auth_header_with_all_permissions
 )
 
 
@@ -16,7 +16,7 @@ def test_it_creates_author_without_technologies_and_projects(client):
     resp = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
@@ -35,7 +35,7 @@ def test_it_returns_404_if_author_data_is_invalid(client):
     resp = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
@@ -53,7 +53,7 @@ def test_it_creates_author_with_technology(client):
     resp = client.post(
         '/technologies',
         json=technology_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     technology = client.get(resp['href']).get_json()['data']
     data = {
@@ -66,7 +66,7 @@ def test_it_creates_author_with_technology(client):
     resp = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
     assert '201' in resp.status
@@ -85,7 +85,7 @@ def test_it_returns_validation_error_if_technology_does_not_exist(client):
     resp = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
@@ -104,7 +104,7 @@ def test_it_edits_given_authors_data(client):
     author_href = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
     edited_data = {
         'email': 'edit_test@gmail.com',
@@ -112,7 +112,7 @@ def test_it_edits_given_authors_data(client):
     resp = client.patch(
         author_href,
         json=edited_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     authors = Author.query.filter(Author.email == 'edit_test@gmail.com').all()
     assert '204' in resp.status
@@ -134,12 +134,12 @@ def test_it_changes_technologies_for_author(client):
     python_resp = client.post(
         '/technologies',
         json=python_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     elixir_resp = client.post(
         '/technologies',
         json=elixir_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     python_technology = client.get(python_resp['href']).get_json()['data']
     elixir_technology = client.get(elixir_resp['href']).get_json()['data']
@@ -152,7 +152,7 @@ def test_it_changes_technologies_for_author(client):
     author_href = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
 
     edited_data = {
@@ -161,7 +161,7 @@ def test_it_changes_technologies_for_author(client):
     resp = client.patch(
         author_href,
         json=edited_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     authors = Author.query.filter(Author.surname == 'Niesiołowski').all()
     assert '204' in resp.status
@@ -174,7 +174,7 @@ def test_it_returns_404_if_edited_author_does_not_exist(client):
     resp = client.patch(
         '/authors/1',
         json=[],
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '404' in resp.status
@@ -190,7 +190,7 @@ def test_it_gets_author(client):
     create_technology_resp_data = client.post(
         '/technologies',
         json=technology_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     technology = client.get(
         create_technology_resp_data['href']
@@ -205,7 +205,7 @@ def test_it_gets_author(client):
     create_author_resp_data = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     resp = client.get(create_author_resp_data['href'])
     author = resp.get_json()['data']
@@ -241,12 +241,12 @@ def test_it_indexes_authors(client):
     client.post(
         '/authors',
         json=first_author,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     client.post(
         '/authors',
         json=second_author,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp = client.get('/authors')
     resp_data = resp.get_json()['data']
@@ -273,12 +273,12 @@ def test_it_deletes_author(client):
     created_author_data = client.post(
         '/authors',
         json=data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()
     authors_before_delete = Author.query.all()
     resp = client.delete(
         created_author_data['href'],
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     authors_after_delete = Author.query.all()
     assert '204' in resp.status
@@ -289,7 +289,7 @@ def test_it_deletes_author(client):
 def test_it_returns_404_if_deleted_author_does_not_exist(client):
     resp = client.delete(
         '/authors/1',
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '404' in resp.status

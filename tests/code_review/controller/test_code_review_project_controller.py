@@ -2,7 +2,7 @@ from app.code_review.model.project import Project
 from tests.code_review.controller.fixture import (
     client,
     create_technology_and_return_id,
-    auth_header_with_all_scopes
+    auth_header_with_all_permissions
 )
 
 
@@ -18,7 +18,7 @@ def test_it_creates_project_for_author(client):
     resp = client.post(
         f'{author_href}/projects',
         json=project,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     projects = Project.query.filter(Project.name == 'Test Project').all()
@@ -39,7 +39,7 @@ def test_it_returns_404_if_author_does_not_exist(client):
     resp = client.post(
         f'authors/1/projects',
         json=project,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     projects = Project.query.filter(Project.name == 'Test Project').all()
@@ -60,7 +60,7 @@ def test_it_returns_422_if_project_does_not_have_technology(client):
     resp = client.post(
         f'{author_href}/projects',
         json=project,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     projects = Project.query.filter(Project.name == 'Test Project').all()
@@ -82,7 +82,7 @@ def test_it_returns_422_if_projects_technology_does_not_exist(client):
     resp = client.post(
         f'{author_href}/projects',
         json=project,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     projects = Project.query.filter(Project.name == 'Test Project').all()
@@ -106,7 +106,7 @@ def test_it_edits_project(client):
     project_href = client.post(
         f'{author_href}/projects',
         json=project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
 
     edited_project = {
@@ -116,7 +116,7 @@ def test_it_edits_project(client):
     resp = client.patch(
         f'{project_href}',
         json=edited_project,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     projects = Project.query.filter(
         Project.name == edited_project['name']
@@ -143,7 +143,7 @@ def test_it_returns_404_if_edited_project_does_not_exist(client):
     resp = client.patch(
         f'{author_href}/projects/1',
         json=project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
 
@@ -164,7 +164,7 @@ def test_it_gets_project_by_id(client):
     project_href = client.post(
         f'{author_href}/projects',
         json=project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
     resp = client.get(project_href)
     resp_data = resp.get_json()['data']
@@ -194,7 +194,7 @@ def test_it_returns_all_projects_for_author(client):
     client.post(
         f'{author_href}/projects',
         json=first_project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     second_project_data = {
         'name': 'Second Project',
@@ -205,7 +205,7 @@ def test_it_returns_all_projects_for_author(client):
     client.post(
         f'{author_href}/projects',
         json=second_project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp = client.get(f'{author_href}/projects')
     resp_data = resp.get_json()['data']
@@ -234,9 +234,12 @@ def test_it_deletes_project_for_author(client):
     project_href = client.post(
         f'{author_href}/projects',
         json=project_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
-    resp = client.delete(project_href, headers=auth_header_with_all_scopes)
+    resp = client.delete(
+        project_href,
+        headers=auth_header_with_all_permissions
+    )
     projects = Project.query.filter(Project.name == 'Test Project').all()
     assert '204' in resp.status
     assert len(projects) == 0
@@ -245,7 +248,7 @@ def test_it_deletes_project_for_author(client):
 def test_it_returns_404_if_project_for_author_does_not_exist(client):
     resp = client.delete(
         'authors/1/projects/1',
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     )
     resp_data = resp.get_json()
     assert '404' in resp.status
@@ -262,5 +265,5 @@ def create_author_and_return_href(client):
     return client.post(
         '/authors',
         json=author_data,
-        headers=auth_header_with_all_scopes
+        headers=auth_header_with_all_permissions
     ).get_json()['href']
