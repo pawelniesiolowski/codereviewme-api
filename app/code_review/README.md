@@ -416,6 +416,3 @@ DELETE https://codereviewme-api.herokuapp.com/reviewers/1
 - **409 Conflict** - resource already exists
 - **422 Unprocessable Entity** - given data is not valid
 - **500 Internal Server Error** - something goes wrong on server side, for example with database connection
-
-# Get authorization headers to test API on production
-To print all tokens for all different roles execute test_tokens.py script: `python test_tokens.py`

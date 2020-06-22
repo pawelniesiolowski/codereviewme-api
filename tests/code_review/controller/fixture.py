@@ -23,32 +23,6 @@ auth_header_with_all_permissions = create_auth_header_with_permissions(
 )
 
 
-auth_header_with_reviewer_permissions = create_auth_header_with_permissions(
-    domain=TestingConfig.AUTH0_DOMAIN,
-    api_audience=TestingConfig.API_AUDIENCE,
-    client_id=TestingConfig.REVIEWER_CLIENT_ID,
-    client_secret=TestingConfig.REVIEWER_CLIENT_SECRET
-)
-
-
-auth_header_with_author_permissions = create_auth_header_with_permissions(
-    domain=TestingConfig.AUTH0_DOMAIN,
-    api_audience=TestingConfig.API_AUDIENCE,
-    client_id=TestingConfig.AUTHOR_CLIENT_ID,
-    client_secret=TestingConfig.AUTHOR_CLIENT_SECRET
-)
-
-
-auth_header_with_codereviewme_admin_permissions = (
-    create_auth_header_with_permissions(
-        domain=TestingConfig.AUTH0_DOMAIN,
-        api_audience=TestingConfig.API_AUDIENCE,
-        client_id=TestingConfig.CODEREVIEWME_ADMIN_CLIENT_ID,
-        client_secret=TestingConfig.CODEREVIEWME_ADMIN_CLIENT_SECRET
-    )
-)
-
-
 def create_technology_and_return_id(client, name='Python'):
     technology_data = {
         'name': name,
