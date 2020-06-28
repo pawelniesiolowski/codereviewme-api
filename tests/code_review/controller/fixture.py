@@ -1,5 +1,5 @@
 import pytest
-from app import create_app
+from app import app
 from app.db import db, drop_everything
 from config import TestingConfig
 from app.auth.auth_token import create_auth_header_with_permissions
@@ -7,7 +7,7 @@ from app.auth.auth_token import create_auth_header_with_permissions
 
 @pytest.fixture
 def client():
-    app = create_app(TestingConfig)
+    app.config.from_object(TestingConfig())
     db.session.remove()
     drop_everything(db)
     db.create_all()
