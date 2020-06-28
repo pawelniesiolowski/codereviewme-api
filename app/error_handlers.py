@@ -2,7 +2,7 @@ from flask import jsonify
 from app.auth.error import AuthError
 
 
-def setup_errors(app):
+def setup_error_handlers(app):
 
     @app.errorhandler(422)
     def validation_error(error):

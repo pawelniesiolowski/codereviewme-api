@@ -2,9 +2,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask.logging import default_handler
 from config import create_config_for_environment
-from app.code_review import setup_module as setup_code_review
 from app.db import db, init_db
-from app.errors import setup_errors
+from app.error_handlers import setup_error_handlers
 from app.logger import setup_logger
 
 
@@ -22,13 +21,15 @@ def create_app(config=None):
 
     init_db(app, db)
 
-    setup_errors(app)
-    setup_code_review(app)
+    setup_error_handlers(app)
 
     return app
 
 
 app = create_app()
+
+
+from app.code_review.controller import author, project, reviewer, technology  # noqa
 
 
 @app.route('/')
